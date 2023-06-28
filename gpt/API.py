@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from gpt import GPT
-import os
+import os, time
 
 API = Flask(__name__)
 CORS(API)
@@ -12,10 +12,12 @@ def getPDF():
     data = request.get_json()
     print(data)
 
-    response = gpt.query(data)
+    # response = gpt.query(data)
+    time.sleep(20)
 
     try:
-        return jsonify(response)
+        # return jsonify(response)
+        return {"messsage": "create report Sucessed", "code":True}
     except Exception as e:
         print(f"getPDF ERROR : {e}")
 

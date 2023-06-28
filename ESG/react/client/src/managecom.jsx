@@ -1,82 +1,56 @@
-import Nav from "./navuser";
-import { useState, Fragment, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import Modal from 'react-modal';
 import './App.css';
-import { serverIP, S3URL } from "./config";
 import './comment.css';
-import donationimg from "./imgfile/donationimg.jpg"
+import axios from "axios";
+import moment from 'moment';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { serverIP, S3URL } from "./axioses/config";
 import ChartComponent from './ChartComponent';
 import { EthProviderInvest } from "./contexts/EthContext";
-import moment from 'moment';
 
 const links = [
     { name: 'ESG보고서 보러가기', href: '#report' },
     { name: '기업 행사 보러가기', href: '#event' },
     { name: '응원 댓글 보러가기', href: '#comment' },
 ]
+
 export default function Managecom() {
-    const [comment, setComment] = useState('');
-    const onChange = event => setComment(event.target.value);
+    return (
+        <EthProviderInvest>
+            <ManagecomForm />
+        </EthProviderInvest>
+    )
+}
+
+function ManagecomForm() {
     const [companyData, setCompanyDetail] = useState("");
     const [tagData, setTagDetail] = useState("");
     const [eventData, seteventList] = useState([]);
     const [commentArray, setCommentArray] = useState([]);
-    const [userId, setUserId] = useState("");
     const [reportData, setReportData] = useState([]);
     const [have, setHave] = useState(0);
+    const [companyId, setCompanyId] = useState('');
+    const [renderData, setRenderData] = useState([]);
 
-    // 한국 시간 함수
-    function javaNow() {
-        var now = new Date();
-
-        var year = now.getFullYear();
-        var month = (now.getMonth() + 1).toString().padStart(2, '0');
-        var day = now.getDate().toString().padStart(2, '0');
-        var hours = now.getHours().toString().padStart(2, '0');
-        var minutes = now.getMinutes().toString().padStart(2, '0');
-        var seconds = now.getSeconds().toString().padStart(2, '0');
-
-        var javaTimestamp = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
-
-        return javaTimestamp;
-    }
-
-    const temp = useParams();// 경로에서 company_id를 추출함
-    const companyId = temp.companyId
-
-    const onSubmit = event => {
-        event.preventDefault();
-        if (comment === '') {
-            return;
+    localStorage.setItem("companyId", useParams().companyId);
+    const tagprint = (arr) => {
+        if (!arr) {
+            return [];
         }
-
-        const newComment = [null, companyId, userId, comment, javaNow()];
-        let DBComment = {
-            "companyid": companyId,
-            "userid": userId,
-            "commentdesc": comment,
-            "time": javaNow()
+        const tags = arr.split('/');
+        const result = [];
+        for (let i = 0; i < tags.length; i++) {
+            result.push(
+                <div>
+                    {tags[i]}
+                </div>
+            );
         }
-        axios
-            .post(serverIP + "/comment/register", JSON.stringify(DBComment), {
-                headers: {
-                    'Content-Type': `application/json`
-                }
-            })
-            .then(response => {
-
-            })
-            .catch((error) => console.log(error));
-
-        setCommentArray(commentValueList => [newComment, ...commentValueList]);
-        setComment('');
+        return result;
     };
 
-    useEffect( () => {
-        const id = localStorage.getItem("userId");
-        setUserId(id);
+    useEffect(() => {
+        setCompanyId(localStorage.getItem("companyId"));
         if (companyId) {
             // userId 값이 있을 때에만 API 호출
             const CompanyLDetail = axios.get(serverIP + `/companies/${companyId}`);
@@ -84,7 +58,6 @@ export default function Managecom() {
             const EventList = axios.get(serverIP + `/events/${companyId}`);
             const CommentList = axios.get(serverIP + `/comments/${companyId}`);
             const report = axios.get(serverIP + `/reports/${companyId}`);
-            localStorage.setItem("chartcomId", companyId);
             Promise
                 .all([CompanyLDetail, TagDetail, EventList, CommentList, report])
                 .then((response) => {
@@ -103,52 +76,21 @@ export default function Managecom() {
                 .catch((error) => {
                     console.log(error);
                 });
-
         }
     }, [companyId]);
 
-    const tagprint = (arr) => {
-        if (!arr) {
-            return []; // arr이 정의되지 않았거나 null인 경우 빈 배열 반환
-        }
-        const tags = arr.split('/'); // '/'를 구분자로 사용하여 문자열을 배열로 분할
-        const result = [];
-        for (let i = 0; i < tags.length; i++) {
-            result.push(
-                <div>
-                    {tags[i]}
-                </div>
-            );
-        }
-        return result;
-    };
-
-    const [chartData, setChartData] = useState(null);
-    const [renderData, setRenderData] = useState([]);
-
-    const companyid = localStorage.getItem("chartcomId");
     useEffect(() => {
-        axios.get(serverIP + `/reports/${companyid}`)
-            .then((res) => {
-                setChartData(res.data.data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }, []);
-
-    useEffect(() => {
-        if (chartData && reportData) {
+        if (reportData) {
             const newRenderData = reportData.map((data, index) => {
                 let fileName = data[4];
                 let splitName = fileName.split('_');
                 fileName = splitName[0] + '_' + splitName[1] + '.pdf';
-    
-                let scores = chartData[index];
+
+                let scores = reportData[index];
                 let escores = scores[5];
                 let sscores = scores[6];
                 let gscores = scores[7];
-    
+
                 return (
                     <div className='grid grid-cols-2 gap-3'>
                         <div class="card shadow border-0 rounded-4">
@@ -172,8 +114,7 @@ export default function Managecom() {
             });
             setRenderData(newRenderData);
         }
-    }, [chartData]);
-
+    }, [reportData]);
 
     const handleDownload = (bname, filename) => {
         const url = "https://" + bname + S3URL + filename;
@@ -183,6 +124,7 @@ export default function Managecom() {
         downbload.setAttribute('type', 'application/json');
         downbload.click();
     };
+
     return (
         <EthProviderInvest>
             <div>
@@ -202,31 +144,26 @@ export default function Managecom() {
                     <img
                         src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-y=.8&w=2830&h=1500&q=80&blend=111827&sat=-100&exp=15&blend-mode=multiply"
                         alt=""
-                        className="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center"
-                    />
+                        className="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center" />
                     <div
                         className="hidden sm:absolute sm:-top-10 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu sm:blur-3xl"
-                        aria-hidden="true"
-                    >
+                        aria-hidden="true">
                         <div
                             className="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-20"
                             style={{
                                 clipPath:
                                     'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                            }}
-                        />
+                            }} />
                     </div>
                     <div
                         className="absolute -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu blur-3xl sm:top-[-28rem] sm:ml-16 sm:translate-x-0 sm:transform-gpu"
-                        aria-hidden="true"
-                    >
+                        aria-hidden="true">
                         <div
                             className="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-20"
                             style={{
                                 clipPath:
                                     'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                            }}
-                        />
+                            }} />
                     </div>
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="ml-0 max-w-2xl lg:mx-0">
@@ -238,7 +175,6 @@ export default function Managecom() {
                             <p className="mt-6 text-lg leading-8 text-gray-300">
                                 {companyData.companydesc}
                             </p>
-
                         </div>
                         <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
                             <div className="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
@@ -248,7 +184,6 @@ export default function Managecom() {
                                     </a>
                                 ))}
                             </div>
-
                             <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-3">
                                 <div className="flex flex-col-reverse">
                                     <dt className="text-base leading-7 text-gray-300">현재 기부금</dt>
@@ -264,7 +199,10 @@ export default function Managecom() {
                                 </div>
                             </dl>
                         </div>
-                        <button type="button" id="invest" className="relative z-10 inline-flex items-center rounded-3 bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-3">
+                        <button
+                            type="button"
+                            id="invest"
+                            className="relative z-10 inline-flex items-center rounded-3 bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-3">
                             투자 승인
                         </button>
                     </div>
@@ -279,6 +217,9 @@ export default function Managecom() {
                                     <div className="mx-auto  max-w-2xl gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
                                         <h2 className="text-base font-semibold leading-7 text-indigo-600">ESG</h2>
                                         <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">지속 가능 경영 보고서</p>
+                                        <div class="text-gray-400">
+                                            기업 NFT ID : <a>{companyData.contractaddr}</a>
+                                        </div>
                                         <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-600 lg:max-w-none">
                                             {renderData}
                                         </dl>
@@ -310,8 +251,7 @@ export default function Managecom() {
                                                             <img
                                                                 src={"https://" + event[3] + S3URL + event[4]}
                                                                 alt=".."
-                                                                className="h-full w-full object-cover object-center lg:h-full lg:w-full"
-                                                            />
+                                                                className="h-full w-full object-cover object-center lg:h-full lg:w-full" />
                                                         </div>
                                                         <div className="flex justify-center mt-3">
                                                             <div>
@@ -339,7 +279,6 @@ export default function Managecom() {
                         </div>
                     </div>
                 </div>
-
                 <div id="page3">
                     <a id="comment" class="smooth"></a>
                     <div className="relative isolate overflow-hidden py-24 sm:py-32">
@@ -364,5 +303,4 @@ export default function Managecom() {
             </div>
         </EthProviderInvest>
     )
-}
-
+};

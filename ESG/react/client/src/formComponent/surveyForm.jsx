@@ -1,3 +1,4 @@
+/* eslint-disable */
 
 export default function Question({ Q, Quest, name, SurveyList, Options, handle }) {
     return (

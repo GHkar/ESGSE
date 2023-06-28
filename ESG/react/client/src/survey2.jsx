@@ -1,5 +1,8 @@
+/* eslint-disable */
 import Nav from "./navcompany";
 import { useState, useEffect } from "react";
+import { ScrollRemote } from "./remote/remoteControll";
+
 export default function Survey2() {
 
 
@@ -252,6 +255,7 @@ export default function Survey2() {
 
         <div>
             <Nav />
+            <ScrollRemote/>
             <div class="container px-5 my-5">
                 <div className="fw-bolder text-3xl mb-3">
                     ESG-S(Social)

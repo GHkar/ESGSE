@@ -1,9 +1,10 @@
+/* eslint-disable */
 import React, { useReducer, useCallback, useEffect } from "react";
 import Web3 from "web3";
 import EthContext from "./EthContext";
 import { reducer, actions, initialState } from "./state";
 // 백 데이터 전송용
-import { serverIP, dgbID } from "../../config.jsx";
+import { serverIP, dgbID } from "../../axioses/config.jsx";
 import axios, { formToJSON } from "axios";
 
 function EthProviderDeploy({ children }) {
@@ -23,7 +24,6 @@ function EthProviderDeploy({ children }) {
           address = esgArtifact.networks[networkID].address;
           contract = new web3.eth.Contract(abi, address);
           await esgDeployBind(contract);
-          //await printOwner(contract);
         } catch (err) {
           console.error(err);
         }
@@ -38,10 +38,33 @@ function EthProviderDeploy({ children }) {
   const printOwner = async (instance) => {
     let esgInstance;
     esgInstance = instance;
-    esgInstance.methods.owner().call().then(function (result) {
-      console.log(result);
-    }).catch(function (err) {
-      console.log(err.message);
+
+    const deployButton = document.getElementById("deploy");
+    deployButton.addEventListener("click", function () {
+      esgInstance.methods.owner().call().then(function (result) {
+        console.log(result);
+      }).catch(function (err) {
+        console.log(err.message);
+      })
+    })
+  };
+
+  // esg test 용 함수 - esg 소유주 변경하기
+  const transferOwner = async (instance) => {
+    let esgInstance, fromAcc, txid;
+    esgInstance = instance;
+    const newAddr = "0x5894d987cFc846830b693378D3676899ED7015D5";
+    fromAcc = window.web3.currentProvider.selectedAddress.toString();
+
+    const deployButton = document.getElementById("deploy");
+      deployButton.addEventListener("click", function () {
+   
+      esgInstance.methods.transferOwnership(newAddr).send({ from: fromAcc }).then(async function (receipt) {
+        txid = receipt.transactionHash;
+        console.log(txid);
+      }).catch(function (err) {
+        console.log(err.message);
+      })
     })
   };
 

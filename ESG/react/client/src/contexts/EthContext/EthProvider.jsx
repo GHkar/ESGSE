@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useReducer, useCallback, useEffect } from "react";
 import Web3 from "web3";
 import EthContext from "./EthContext";

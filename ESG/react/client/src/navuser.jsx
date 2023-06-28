@@ -1,8 +1,10 @@
 import React from "react";
 
 export default function Navuser() {
-    // local storage에서 userId 값을 가져옴
-    const userId = localStorage.getItem("userid");
+
+    const Logout = () =>{
+        localStorage.clear()
+    }
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-white py-3 shadow">
@@ -11,15 +13,12 @@ export default function Navuser() {
                     <span className="fw-bolder text-primary">ESGSE</span>
                 </a>
                 <ul className="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
-                    {/* <li className="nav-item">
-                        <a className="nav-link" href="/home">Home</a>
-                    </li> */}
 
                     <li className="nav-item">
-                        <a className="nav-link" href={`/home/user/${userId}`}>마이 페이지</a>
+                        <a className="nav-link" href={`/home/MyPage`}>마이 페이지</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">로그 아웃</a>
+                    <li className="nav-item">
+                        <a className="nav-link" href="/" onClick={Logout}>로그 아웃</a>
                     </li>
                 </ul>
             </div>

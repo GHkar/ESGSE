@@ -32,15 +32,16 @@ class DataBase:
         E, S, G = [*map(lambda x : sum(x)/len(x), scores.values())]
         print(fileName, E,S,G)
         try:
+            # query = """insert into report 
+            # (contract_addr, report_id, register_time, file_name, e_score, s_score, g_score)
+            # values
+            # ((select contract_addr from company where company_id = %s), '0', now(), %s, %s, %s, %s)"""
             query = """insert into report 
             (contract_addr, report_id, register_time, file_name, e_score, s_score, g_score)
             values
-            ((select contract_addr from company where company_id = %s), '0', now(), %s, %s, %s, %s)"""
-            # query = """insert into report
-            # (contract_addr, report_id, register_time, file_name, e_score, s_score, g_score)
-            # values
-            # ('kimgh5303', '5303', now(), %s, %s, %s, %s)"""
-            self.__cs.execute(query, (companyID, fileName, E, S, G))
+            ('5304', '0', now(), %s, %s, %s, %s)"""
+            # self.__cs.execute(query, (companyID, fileName, E, S, G))
+            self.__cs.execute(query, (fileName, E, S, G))
             self.__conn.commit()
             query = """insert into file values (%s, %s, now())"""
             self.__cs.execute(query, (fileName, bukName))

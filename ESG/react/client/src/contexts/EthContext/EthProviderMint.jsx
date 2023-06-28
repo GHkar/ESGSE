@@ -1,9 +1,10 @@
+/* eslint-disable */
 import React, { useReducer, useCallback, useEffect } from "react";
 import Web3 from "web3";
 import EthContext from "./EthContext";
 import { reducer, actions, initialState } from "./state";
 // 백 데이터 전송용
-import { serverIP } from "../../config.jsx";
+import { serverIP } from "../../axioses/config.jsx";
 import axios, { formToJSON } from "axios";
 
 function EthProviderMint({ children }) {

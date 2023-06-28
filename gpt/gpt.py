@@ -56,7 +56,6 @@ class GPT:
     
     def __GPT(self, content):
         try:
-            print('gpt')
             response = ai.ChatCompletion.create(
                         model='gpt-3.5-turbo',
                         messages=[
@@ -66,7 +65,7 @@ class GPT:
                         ]
                     )
         except Exception as e:
-            print(f"Error : {e}")
+            print(f"GPT Error : {e}")
             return "", True
         return response.choices[0].message.content, False
 

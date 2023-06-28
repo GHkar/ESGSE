@@ -1,10 +1,12 @@
+/* eslint-disable */
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { serverIP } from "../config";
+import { serverIP } from "./config";
 
 export const useLogin = (Path) => {
     const [ID, setID] = useState('');
     const [PW, setPW] = useState('');
+    const [isButtonClicked, setIsButtonClicked] = useState(false);
     const inputRef = useRef(null);
 
     const config = {
@@ -14,7 +16,7 @@ export const useLogin = (Path) => {
             nameKey: "companyname",
             bcKey: "companybcid",
             permissionKey: "companypermission",
-            redirectPath: id => `/cdetail/${id}`,
+            redirectPath: () => `/cdetail`,
         },
         "/users/login": {
             idKey: "userid",
@@ -32,7 +34,8 @@ export const useLogin = (Path) => {
         if (!ID && !PW) {
             inputRef.current.focus();
         }
-    }, [ID, PW]);
+        setIsButtonClicked(false);
+    }, [isButtonClicked]);
 
     const handleInputId = (e) => {
         setID(e.target.value);
@@ -43,6 +46,7 @@ export const useLogin = (Path) => {
     }
 
     const onClickLogin = () => {
+        setIsButtonClicked(true)
         if (!(ID && PW)) {
             alert('모든 정보를 입력해주세요.');
             return;

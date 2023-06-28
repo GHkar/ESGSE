@@ -1,17 +1,17 @@
-import Nav from "./navcompany";
+/* eslint-disable */
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { serverIP } from "./config"
+import { serverIP } from "./axioses/config"
+import Nav from "./navcompany";
 
 export default function Insertevent() {
     let [mainImg, setMainImg] = useState("");
     const [companyId, setCompanyId] = useState("");
     const [inputname, setInputname] = useState('')
     const [inputdesc, setInputdesc] = useState('')
-    const [file, setFile] = useState(null); // 파일 변수 추가
+    const [file, setFile] = useState(null);
 
     useEffect(() => {
-        // 로컬 스토리지에서 id 값 가져오기
         const companyId = localStorage.getItem("companyid");
         setCompanyId(companyId);
     }, []);
@@ -36,7 +36,6 @@ export default function Insertevent() {
         setFile(event.target.files[0]);
     }
 
-    // 행사 추가 버튼
     const onClickAddEvent = () => {
 
         const formData = new FormData();
@@ -74,10 +73,8 @@ export default function Insertevent() {
                             <input
                                 type="text"
                                 placeholder="행사 제목"
-                                // value={comment}
                                 onChange={handleInputname}
-                                className="w-full border-gray-900/25 border-solid border-2 rounded-4 pl-3 py-2 mb-3"
-                            />
+                                className="w-full border-gray-900/25 border-solid border-2 rounded-4 pl-3 py-2 mb-3"/>
                             <textarea
                                 id="about"
                                 name="about"
@@ -85,19 +82,16 @@ export default function Insertevent() {
                                 rows={3}
                                 onChange={handleInputdesc}
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                defaultValue={''}
-                            />
+                                defaultValue={''}/>
                         </div>
                         <div className="text-center content-center float-right">
                             <div className=" d-flex justify-center">
                                 <img src={mainImg} className="w-80"></img>
-
                             </div>
                             <div className="mt-4 flex text-sm leading-6 text-gray-600 justify-center">
                                 <label
                                     htmlFor="file-upload"
-                                    className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                                >
+                                    className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
                                     <span>Upload a file</span>
                                     <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={setPreviewImg} />
                                 </label>
@@ -108,8 +102,7 @@ export default function Insertevent() {
                     <div>
                         <button
                             className="btn btn-primary px-4 py-3 mt-3 float-right"
-                            onClick={onClickAddEvent}
-                        >
+                            onClick={onClickAddEvent}>
                             <div className="d-inline-block bi bi-download"></div>
                             등록하기
                         </button>

@@ -1,10 +1,8 @@
 import Nav from "./navcompany";
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
-import Modal from 'react-modal'
-import GifComponent from "./gifcomponent";
-import earthGif from './imgfile/earth.gif';
-import loading from "./imgfile/loading.gif"
+import CustomModal from "./formComponent/ModalForm";
+import { ScrollRemote } from "./remote/remoteControll";
 
 export default function Survey3() {
     const handleOptionChange = (questionIndex, event) => {
@@ -46,21 +44,18 @@ export default function Survey3() {
             newOptions[0] = ['1']; // 첫 번째 체크 박스 선택
             return newOptions;
         });
-    }, []);
-    useEffect(() => {
         setSelectedOptionsQ12(prevOptions => {
             const newOptions = [...prevOptions];
             newOptions[0] = ['1']; // 첫 번째 체크 박스 선택
             return newOptions;
         });
-    }, []);
-    useEffect(() => {
         setSelectedOptionsQ15(prevOptions => {
             const newOptions = [...prevOptions];
             newOptions[0] = ['1']; // 첫 번째 체크 박스 선택
             return newOptions;
         });
     }, []);
+
     const handleOptionChangecheck = (questionIndex, event, questionType) => {
         const value = event.target.value;
 
@@ -187,17 +182,12 @@ export default function Survey3() {
     const result = JSON.stringify(Object.assign(id, JSON.parse(JsonE), JSON.parse(JsonS), JSON.parse(JsonG)));
 
     const [ModalOpen, SetModalOpen] = useState(false);
+    const [state, setState] = useState({
+        ModalOpen : false,
+})
+    
     const [res, SetRes] = useState(null);
-    const customStyles = {
-        content: {
-            top: '50%',
-            left: '50%',
-            right: 'auto',
-            bottom: 'auto',
-            marginRight: '-50%',
-            transform: 'translate(-50%, -50%)'
-        }
-    };
+    
 
     const onClickJson = () => {
         SetModalOpen(true);
@@ -224,6 +214,7 @@ export default function Survey3() {
     return (
         <div>
             <Nav />
+            <ScrollRemote/>
             <div class="container px-5 my-5">
                 <div className="fw-bolder text-3xl mb-3">
                     ESG-G(Governance)
@@ -419,17 +410,11 @@ export default function Survey3() {
                 <button type="button" onClick={onClickJson} className="relative z-5 inline-flex items-center rounded-3 bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 float-right mt-3">
                     설문 완료
                 </button>
-                <Modal
-                    isOpen={ModalOpen}
-                    onRequestClose={() => SetModalOpen(false)}
-                    shouldCloseOnOverlayClick={false}
-                    style={customStyles}
-                    contentLabel='보고서 생성 중...'>
-                    <h2 className="text-center">보고서 생성 중 입니다.<br />잠시만 기다려주세요.<br/>(15~20분 정도 소요됩니다)</h2>
-                    <GifComponent gif={loading} />
-                    {res === true &&
-                        <button onClick={() => SetModalOpen(false)}>닫기</button>}
-                </Modal>
+                <CustomModal
+                    openHandle={ModalOpen}
+                    closeFunc={setState}
+                    Text={'보고서 생성 중 입니다.\n잠시만 기다려주세요.\n(15~20분 정도 소요됩니다)'}
+                    type={1} />
                 <div className="flex items-center justify-center border-gray-200 bg-white px-4 py-3 sm:px-6">
                     <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                         <a href="/survey1" aria-current="page" className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">

@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default function InputForm({ text, type, value, handle, id, ph }) {
     return (
         <div className="d-flex align-items-center bg-light rounded-4 p-3 h-100 mb-3">

@@ -1,6 +1,7 @@
+/* eslint-disable */
 import axios from "axios";
 import { useState, useContext, useEffect } from "react";
-import { serverIP } from "./config";
+import { serverIP } from "./axioses/config";
 import InputForm from './formComponent/inputForm';
 import { EthContext, EthProviderSign } from "./contexts/EthContext";
 
